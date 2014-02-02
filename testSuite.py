@@ -5,6 +5,8 @@ import json
 import csv
 import os
 
+NUM_TEST_CASES_FOR_CONVERSION = 20
+
 ## presetted input constants
 EMPTY_ITEM = ''
 SINGLE_CHAR_ITEM = 's'
@@ -18,25 +20,30 @@ def main():
     create_directories()
     create_test_cases()
     run_test()
-
-def write_input(lines, case_number):
-    inputfile = open("TestFiles/TestCase" + str(case_number) + ".csv","w")
-    for line in lines:
-        inputfile.write(line + "\n")
-
-def write_output(lines, case_number):
-    outfile = open("ExpectedOutput/output" + str(case_number) + ".json","w")
-    for line in lines:
-        outfile.write("[" + line + "]")      
+    compare_outputs()
 
 def run_test():
-    for i in range(20):
+    for i in range(1, NUM_TEST_CASES_FOR_CONVERSION + 1):
         os.system("python csv2json <TestFiles/TestCase" + str(i) + ".csv> TestOutput/Files/output" + str(i) + ".json")
 
+def compare_outputs():
+    result = open("TestResult/TestResult.txt","w")
+    for i in range(1,NUM_TEST_CASES_FOR_CONVERSION + 1):
+        expected_output_file = open("ExpectedOutput/output" + str(i) + ".json", "r")
+        actual_output_file = open("TestOutput/Files/output" + str(i) + ".json", "r")
+        expected_output = json.load(expected_output_file)
+        actual_output = json.load(actual_output_file)
+        if(expected_output == actual_output):
+            result.write("Test Case" + str(i) + " : " + "Pass\n")
+        else:
+            result.write("Test Case" + str(i) + " : " + "Fail\n")
+    result.close()
+    
 def create_directories():
     create_directory("TestFiles")
     create_directory("TestOutput/Files")
     create_directory("ExpectedOutput")
+    create_directory("TestResult")
 
 def create_directory(directory):
     if not os.path.exists(directory):
@@ -63,6 +70,69 @@ def create_test_cases():
     test_case18()
     test_case19()
     test_case20()    
+
+##Write Testcase csv input files
+def write_input(lines, case_number):
+    inputfile = open("TestFiles/TestCase" + str(case_number) + ".csv","w")
+    for line in lines:
+        inputfile.write(line + "\n")
+
+def insert_csv_lines(line1, line2):
+    lines = []
+    if(line1 != None):
+        lines.append(format_csv_line(line1)) 
+    if(line2 != None):
+        lines.append(format_csv_line(line2))
+    return lines
+        
+def format_csv_line(items):
+    return ','.join(items)
+
+
+##Write Expected json file outputs
+def write_output(lines, case_number):
+    outfile = open("ExpectedOutput/output" + str(case_number) + ".json","w")
+    for line in lines:
+        if(line == None or line == ''):
+            outfile.write("[" + line + "]")
+        else:
+            outfile.write("[{" + line + "}]")
+            
+def insert_json_lines(line1, line2):
+    lines = []
+    if(line1 != None):
+        if(line2 != None):
+            lines.append(format_json_line(line1, line2))
+        else:
+            lines.append('')
+    return lines
+
+def format_json_line(line1, line2):
+    lines = []
+    for i in range(max(len(line1), len(line2))):
+        try:
+            string_format = '"' + str(format_json_item(line1[i])) + '": "' + str(format_json_item(line2[i])) + '"'
+        except:
+            #formatting null fieldname or record
+            if(len(line1) == max(len(line1), len(line2))):
+                string_format = '"' + str(format_json_item(line1[i])) + '": null'
+            else:
+               string_format = '"null":"' + str(format_json_item(line2[i])) + '"' 
+        lines.append(string_format)
+    return ','.join(lines)
+
+def remove_first_cover_quote(item):
+    if(item != None and len(item) > 2):
+        if(item.startswith('"') and item.endswith('"')):
+            return item[1:len(item)-1]
+    return item
+
+def format_json_item(item):
+    item = remove_first_cover_quote(item)
+    if(item != None):
+        item = item.replace('"', '\\"')
+    return item
+
 
 ##Test Cases
 def test_case1():
@@ -131,48 +201,6 @@ def create_test_files(line1, line2, case_number):
     json_lines = insert_json_lines(line1, line2)
     write_output(json_lines, case_number)
 
-def insert_csv_lines(line1, line2):
-    lines = []
-    if(line1 != None):
-        lines.append(format_csv_line(line1)) 
-    if(line2 != None):
-        lines.append(format_csv_line(line2))
-    return lines
-        
-def format_csv_line(items):
-    return ','.join(items)
-
-def insert_json_lines(line1, line2):
-    lines = []
-    if(line1 != None):
-        if(line2 != None):
-            if(len(line1) < max(len(line1), len(line2))):
-               for i in range(len(line2) - len(line1)):
-                   line1.append(None)
-            else:
-               for i in range(len(line1) - len(line2)):
-                   line2.append(None)
-            lines.append(format_json_line(line1, line2))
-    return lines
-
-def format_json_line(line1, line2):
-    lines = []
-    for i in range(max(len(line1), len(line2))):
-        string_format = '{"' + str(format_json_item(line1[i])) + '": "' + str(format_json_item(line2[i])) + '"}'
-        lines.append(string_format)
-    return ','.join(lines)
-
-def remove_first_cover_quote(item):
-    if(item != None and len(item) > 2):
-        if(item.startswith('"') and item.endswith('"')):
-            return item[1:len(item)-1]
-    return item
-
-def format_json_item(item):
-    item = remove_first_cover_quote(item)
-    if(item != None):
-        item = item.replace('"', '\\"')
-    return item
     
 ##Line combination
 def line_combo1():
