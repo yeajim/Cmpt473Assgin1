@@ -152,9 +152,9 @@ def write_filename_test_output(outputs):
     
 def filename_error_compare(case_number, expected_status, actual_status):
     if(expected_status == actual_status):
-        result = "Test Case " + str(case_number) +" : Pass\n"
+        result = "Test Case " + str(case_number) +" (Expected Status=" + str(expected_status) + " , Actual Status:" + str(actual_status) + "): Pass\n"
     else:
-        result = "Test Case " + str(case_number) +" : Fail\n"
+        result = "Test Case " + str(case_number) +" (Expected Status=" + str(expected_status) + " , Actual Status:" + str(actual_status) + "): Fail\n"
     return result
 
 
