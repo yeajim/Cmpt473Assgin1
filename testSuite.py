@@ -7,7 +7,7 @@ import os
 
 NUM_TEST_CASES_FOR_CONVERSION = 20
 
-## presetted input constants
+## Presetted Input Constants
 EMPTY_ITEM = ''
 SINGLE_CHAR_ITEM = 's'
 MANY_CHAR_ITEM = 'many char'
@@ -21,6 +21,7 @@ def main():
     create_test_cases()
     run_test()
     compare_outputs()
+    run_filename_tests()
 
 def run_test():
     for i in range(1, NUM_TEST_CASES_FOR_CONVERSION + 1):
@@ -69,9 +70,10 @@ def create_test_cases():
     test_case17()
     test_case18()
     test_case19()
-    test_case20()    
+    test_case20()
 
-##Write Testcase csv input files
+
+##Write Testcase CSV Input Files
 def write_input(lines, case_number):
     inputfile = open("TestFiles/TestCase" + str(case_number) + ".csv","w")
     for line in lines:
@@ -89,7 +91,7 @@ def format_csv_line(items):
     return ','.join(items)
 
 
-##Write Expected json file outputs
+##Write Expected JSON File Output
 def write_output(lines, case_number):
     outfile = open("ExpectedOutput/output" + str(case_number) + ".json","w")
     for line in lines:
@@ -127,11 +129,70 @@ def remove_first_cover_quote(item):
             return item[1:len(item)-1]
     return item
 
+
+## Generating Filename Tests
 def format_json_item(item):
     item = remove_first_cover_quote(item)
     if(item != None):
         item = item.replace('"', '\\"')
     return item
+
+def run_filename_tests():
+    outputs = []
+    outputs.append(test_case21())
+    outputs.append(test_case22())
+    outputs.append(test_case23())
+    outputs.append(test_case24())
+    write_filename_test_output(outputs)
+
+def write_filename_test_output(outputs):
+    result = open("TestResult/FilenameTestResult.txt","w")
+    for output in outputs:
+        result.write(output)
+    
+def filename_error_compare(case_number, expected_status, actual_status):
+    if(expected_status == actual_status):
+        result = "Test Case " + str(case_number) +" : Pass\n"
+    else:
+        result = "Test Case " + str(case_number) +" : Fail\n"
+    return result
+
+
+## Generating Filename Tests: Existing input file & output file overriding test
+def create_csv_for_filename_test():
+    result = open("TestFiles/Exist.csv","w")
+    result.write('exist\n')
+    result.write('file')
+    result.close()
+
+def create_json_for_filename_test():
+    result = open("ExpectedOutput/Exist.json","wb")
+    json.dump([{"initial":"file"}], result)
+    expected_result = open("TestOutput/Files/Exist.json","w")
+    expected_result.write('[{"exist":"file"}]')
+    result.close()
+    expected_result.close()
+
+def filename_override_output_compare(case_number):
+    result = open("TestResult/TestResult.txt","a")
+    expected_output_file = open("ExpectedOutput/Exist.json", "r")
+    actual_output_file = open("TestOutput/Files/Exist.json", "r")
+    expected_output = json.load(expected_output_file)
+    actual_output = json.load(actual_output_file)
+    if(expected_output == actual_output):
+        result.write("Test Case" + str(case_number) + " : " + "Pass\n")
+    else:
+        result.write("Test Case" + str(case_number) + " : " + "Fail\n")
+
+def run_filename_test_command(input_name, output_name):
+    if(input_name == None):
+        command = "python csv2json ExpectedOutput/" + str(output_name) + ".json"
+    elif(output_name == None):
+        command = "python csv2json <TestFiles/" + str(input_name) + ".csv>"
+    else:
+        command = "python csv2json <TestFiles/" + str(input_name) + ".csv> ExpectedOutput/Exist.json"
+    status = os.system(command)
+    return status
 
 
 ##Test Cases
@@ -194,6 +255,28 @@ def test_case19():
 
 def test_case20():
     create_test_files(line_combo5(), line_combo7(), 20)
+
+
+## Filename Test Cases
+def test_case21():
+    status = run_filename_test_command("NotExist", "NotExist")
+    return filename_error_compare(21, 1, status)
+
+def test_case22():
+    status = run_filename_test_command(None, "NotExist")
+    return filename_error_compare(22, 1, status)
+
+def test_case23():
+    create_csv_for_filename_test()
+    create_json_for_filename_test()
+    status = run_filename_test_command("Exist", "Exist")    
+    filename_override_output_compare(23)
+    return filename_error_compare(23, 0, status)
+
+def test_case24():
+    create_csv_for_filename_test()
+    status = run_filename_test_command("Exist", None)
+    return filename_error_compare(24, 1, status)
 
 def create_test_files(line1, line2, case_number):
     lines = insert_csv_lines(line1, line2)
