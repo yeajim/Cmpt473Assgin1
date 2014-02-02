@@ -17,25 +17,26 @@ itemlist = [EMPTY_ITEM, SINGLE_CHAR_ITEM, MANY_CHAR_ITEM, COVER_QUOTE_ITEM, ELSE
 def main():
     create_directories()
     create_test_cases()
-    write_output()
     run_test()
 
 def write_input(lines, case_number):
-    inputfile = open("TestFiles/TestCase" + case_number,"w")
+    inputfile = open("TestFiles/TestCase" + str(case_number) + ".csv","w")
     for line in lines:
         inputfile.write(line + "\n")
 
-def write_output():
-    with open('out.json', 'w') as outfile:
-        json.dump([{'test1':1, 'test2':2}], outfile)
+def write_output(lines, case_number):
+    outfile = open("ExpectedOutput/output" + str(case_number) + ".json","w")
+    for line in lines:
+        outfile.write("[" + line + "]")      
 
 def run_test():
     for i in range(20):
-        os.system("python csv2json <TestFiles/TestCase" + str(i) + ".csv> ActualOutput/output" + str(i) + ".json")
+        os.system("python csv2json <TestFiles/TestCase" + str(i) + ".csv> TestOutput/Files/output" + str(i) + ".json")
 
 def create_directories():
     create_directory("TestFiles")
-    create_directory("ActualOutput")
+    create_directory("TestOutput/Files")
+    create_directory("ExpectedOutput")
 
 def create_directory(directory):
     if not os.path.exists(directory):
@@ -65,84 +66,70 @@ def create_test_cases():
 
 ##Test Cases
 def test_case1():
-    lines = insert_csv_lines(line_combo1(), None)
-    write_input(lines, "1.csv")
+    create_test_files(line_combo1(), None, 1)
 
 def test_case2():
-    lines = insert_csv_lines(line_combo2(), None)
-    write_input(lines, "2.csv")
+    create_test_files(line_combo2(), None, 2)
 
 def test_case3():
-    lines = insert_csv_lines(line_combo3(), None)
-    write_input(lines, "3.csv")
+    create_test_files(line_combo3(), None, 3)
 
 def test_case4():
-    lines = insert_csv_lines(line_combo4(), None)
-    write_input(lines, "4.csv")
+    create_test_files(line_combo4(), None, 4)
     
 def test_case5():
-    lines = insert_csv_lines(line_combo5(), None)
-    write_input(lines, "5.csv")
+    create_test_files(line_combo5(), None, 5)
 
 def test_case6():
-    lines = insert_csv_lines(line_combo6(), None)
-    write_input(lines, "6.csv")
+    create_test_files(line_combo6(), None, 6)
 
 def test_case7():
-    lines = insert_csv_lines(line_combo7(), None)
-    write_input(lines, "7.csv")
+    create_test_files(line_combo7(), None, 7)
 
 def test_case8():
-    lines = insert_csv_lines(line_combo8(), None)
-    write_input(lines, "8.csv")
-
+    create_test_files(line_combo8(), None, 8)
+    
 def test_case9():
-    lines = insert_csv_lines(line_combo2(), line_combo3())
-    write_input(lines, "9.csv")
+    create_test_files(line_combo2(), line_combo3(), 9)
 
 def test_case10():
-    lines = insert_csv_lines(line_combo4(), line_combo5())
-    write_input(lines, "10.csv")
+    create_test_files(line_combo4(), line_combo5(), 10)
 
 def test_case11():
-    lines = insert_csv_lines(line_combo6(), line_combo7())
-    write_input(lines, "11.csv")
+    create_test_files(line_combo6(), line_combo7(), 11)
 
 def test_case12():
-    lines = insert_csv_lines(line_combo7(), line_combo8())
-    write_input(lines, "12.csv")
+    create_test_files(line_combo7(), line_combo8(), 12)
 
 def test_case13():
-    lines = insert_csv_lines(line_combo6(), line_combo2())
-    write_input(lines, "13.csv")
+    create_test_files(line_combo6(), line_combo2(), 13)
 
 def test_case14():
-    lines = insert_csv_lines(line_combo7(), line_combo3())
-    write_input(lines, "14.csv")
+    create_test_files(line_combo7(), line_combo3(), 14)
 
 def test_case15():
-    lines = insert_csv_lines(line_combo8(), line_combo4())
-    write_input(lines, "15.csv")
+    create_test_files(line_combo8(), line_combo4(), 15)
 
 def test_case16():
-    lines = insert_csv_lines(line_combo7(), line_combo5())
-    write_input(lines, "16.csv")
+    create_test_files(line_combo7(), line_combo5(), 16)
 
 def test_case17():
-    lines = insert_csv_lines(line_combo2(), line_combo6())
-    write_input(lines, "17.csv")
+    create_test_files(line_combo2(), line_combo6(), 17)
 
 def test_case18():
-    lines = insert_csv_lines(line_combo3(), line_combo7())
-    write_input(lines, "18.csv")
+    create_test_files(line_combo3(), line_combo7(), 18)
 
 def test_case19():
-    lines = insert_csv_lines(line_combo4(), line_combo8())
-    write_input(lines, "19.csv")
+    create_test_files(line_combo4(), line_combo8(), 19)
 
 def test_case20():
-    lines = insert_csv_lines(line_combo5(), line_combo7())
-    write_input(lines, "20.csv")
+    create_test_files(line_combo5(), line_combo7(), 20)
+
+def create_test_files(line1, line2, case_number):
+    lines = insert_csv_lines(line1, line2)
+    write_input(lines, case_number)
+    json_lines = insert_json_lines(line1, line2)
+    write_output(json_lines, case_number)
 
 def insert_csv_lines(line1, line2):
     lines = []
@@ -151,10 +138,42 @@ def insert_csv_lines(line1, line2):
     if(line2 != None):
         lines.append(format_csv_line(line2))
     return lines
-
+        
 def format_csv_line(items):
     return ','.join(items)
 
+def insert_json_lines(line1, line2):
+    lines = []
+    if(line1 != None):
+        if(line2 != None):
+            if(len(line1) < max(len(line1), len(line2))):
+               for i in range(len(line2) - len(line1)):
+                   line1.append(None)
+            else:
+               for i in range(len(line1) - len(line2)):
+                   line2.append(None)
+            lines.append(format_json_line(line1, line2))
+    return lines
+
+def format_json_line(line1, line2):
+    lines = []
+    for i in range(max(len(line1), len(line2))):
+        string_format = '{"' + str(format_json_item(line1[i])) + '": "' + str(format_json_item(line2[i])) + '"}'
+        lines.append(string_format)
+    return ','.join(lines)
+
+def remove_first_cover_quote(item):
+    if(item != None and len(item) > 2):
+        if(item.startswith('"') and item.endswith('"')):
+            return item[1:len(item)-1]
+    return item
+
+def format_json_item(item):
+    item = remove_first_cover_quote(item)
+    if(item != None):
+        item = item.replace('"', '\\"')
+    return item
+    
 ##Line combination
 def line_combo1():
     return generate_line(None, None)
