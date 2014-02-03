@@ -103,6 +103,13 @@ def create_test_cases():
     test_case47()
     test_case48()
 
+def run_filename_tests():
+    outputs = []
+    outputs.append(test_case49())
+    outputs.append(test_case50())
+    outputs.append(test_case51())
+    outputs.append(test_case52())
+    write_filename_test_output(outputs)
 
 ##Write Testcase CSV Input Files
 def write_input(lines, case_number):
@@ -135,9 +142,9 @@ def insert_json_lines(line1, line2, line3=None):
     lines = []
     max_length = calculate_max_length(line1, line2, line3)
     if(line1 != None):
-        if(line2 != None):
+        if(line2 != None and len(line2) >= 1):
             lines.append(format_json_line(line1, line2, max_length))
-        if(line3 != None):
+        if(line3 != None and len(line3) >= 1):
             lines.append(format_json_line(line1, line3, max_length))
     return lines
 
@@ -175,22 +182,13 @@ def remove_first_cover_quote(item):
             return item[1:len(item)-1]
     return item
 
-
-## Generating Filename Tests
 def format_json_item(item):
     item = remove_first_cover_quote(item)
     if(item != None):
         item = item.replace('"', '\\"')
     return item
 
-def run_filename_tests():
-    outputs = []
-    outputs.append(test_case49())
-    outputs.append(test_case50())
-    outputs.append(test_case51())
-    outputs.append(test_case52())
-    write_filename_test_output(outputs)
-
+## Generating Filename Tests
 def write_filename_test_output(outputs):
     result = open("TestResult/FilenameTestResult.txt","w")
     for output in outputs:
@@ -202,6 +200,16 @@ def filename_error_compare(case_number, expected_status, actual_status):
     else:
         result = "Test Case " + str(case_number) +" (Expected Status=" + str(expected_status) + " , Actual Status:" + str(actual_status) + "): Fail\n"
     return result
+
+def run_filename_test_command(input_name, output_name):
+    if(input_name == None):
+        command = "python csv2json ExpectedOutput/" + str(output_name) + ".json"
+    elif(output_name == None):
+        command = "python csv2json <TestFiles/" + str(input_name) + ".csv>"
+    else:
+        command = "python csv2json <TestFiles/" + str(input_name) + ".csv> ExpectedOutput/Exist.json"
+    status = os.system(command)
+    return status
 
 
 ## Generating Filename Tests: Existing input file & output file overriding test
@@ -229,16 +237,6 @@ def filename_override_output_compare(case_number):
         result.write("Test Case" + str(case_number) + " : " + "Pass\n")
     else:
         result.write("Test Case" + str(case_number) + " : " + "Fail\n")
-
-def run_filename_test_command(input_name, output_name):
-    if(input_name == None):
-        command = "python csv2json ExpectedOutput/" + str(output_name) + ".json"
-    elif(output_name == None):
-        command = "python csv2json <TestFiles/" + str(input_name) + ".csv>"
-    else:
-        command = "python csv2json <TestFiles/" + str(input_name) + ".csv> ExpectedOutput/Exist.json"
-    status = os.system(command)
-    return status
 
 
 ##Test Cases
