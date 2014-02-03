@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # encoding: utf-8
 
+## Cmpt 473 Assignment 1 Test Suite
+## Yeaji Moon - 301097918
+## Rei Li
+
 import json
 import csv
 import os
-
-NUM_TEST_CASES_FOR_CONVERSION = 20
 
 ## Presetted Input Constants
 EMPTY_ITEM = ''
@@ -13,8 +15,10 @@ SINGLE_CHAR_ITEM = 's'
 MANY_CHAR_ITEM = 'many char'
 COVER_QUOTE_ITEM = '"cover quote"'
 ELSE_QUOTE_ITEM = 'else"quote'
+NEW_LINE = '\n'
+NUM_TEST_CASES_FOR_CONVERSION = 48
 
-itemlist = [EMPTY_ITEM, SINGLE_CHAR_ITEM, MANY_CHAR_ITEM, COVER_QUOTE_ITEM, ELSE_QUOTE_ITEM]
+itemlist = [EMPTY_ITEM, SINGLE_CHAR_ITEM, MANY_CHAR_ITEM, COVER_QUOTE_ITEM, ELSE_QUOTE_ITEM, NEW_LINE]
 
 def main():
     create_directories()
@@ -71,6 +75,34 @@ def create_test_cases():
     test_case18()
     test_case19()
     test_case20()
+    test_case21()
+    test_case22()
+    test_case23()
+    test_case24()
+    test_case25()
+    test_case26()
+    test_case27()
+    test_case28()
+    test_case29()
+    test_case30()
+    test_case31()
+    test_case32()
+    test_case33()
+    test_case34()
+    test_case35()
+    test_case36()
+    test_case37()
+    test_case38()
+    test_case39()
+    test_case40()
+    test_case41()
+    test_case42()
+    test_case43()
+    test_case44()
+    test_case45()
+    test_case46()
+    test_case47()
+    test_case48()
 
 
 ##Write Testcase CSV Input Files
@@ -79,12 +111,14 @@ def write_input(lines, case_number):
     for line in lines:
         inputfile.write(line + "\n")
 
-def insert_csv_lines(line1, line2):
+def insert_csv_lines(line1, line2, line3=None):
     lines = []
     if(line1 != None):
         lines.append(format_csv_line(line1)) 
     if(line2 != None):
         lines.append(format_csv_line(line2))
+    if(line3 != None):
+        lines.append(format_csv_line(line3))
     return lines
         
 def format_csv_line(items):
@@ -94,34 +128,47 @@ def format_csv_line(items):
 ##Write Expected JSON File Output
 def write_output(lines, case_number):
     outfile = open("ExpectedOutput/output" + str(case_number) + ".json","w")
-    for line in lines:
-        if(line == None or line == ''):
-            outfile.write("[" + line + "]")
-        else:
-            outfile.write("[{" + line + "}]")
+    result = ','.join(lines)
+    result = '[' + result + ']'
+    outfile.write(result)
             
-def insert_json_lines(line1, line2):
+def insert_json_lines(line1, line2, line3=None):
     lines = []
+    max_length = calculate_max_length(line1, line2, line3)
     if(line1 != None):
         if(line2 != None):
-            lines.append(format_json_line(line1, line2))
-        else:
-            lines.append('')
+            lines.append(format_json_line(line1, line2, max_length))
+        if(line3 != None):
+            lines.append(format_json_line(line1, line3, max_length))
     return lines
 
-def format_json_line(line1, line2):
+def calculate_max_length(line1, line2, line3):
+    if(line2 == None):
+        if(line3 == None):
+            return len(line1)
+        else:
+            return max(len(line1), len(line3))
+    elif(line3 == None):
+        return max(len(line1), len(line2))
+    else:
+        return max(len(line1), len(line2), len(line3))
+
+def format_json_line(line1, line2, max_length):
     lines = []
-    for i in range(max(len(line1), len(line2))):
+    for i in range(max_length):
         try:
             string_format = '"' + str(format_json_item(line1[i])) + '": "' + str(format_json_item(line2[i])) + '"'
         except:
             #formatting null fieldname or record
-            if(len(line1) == max(len(line1), len(line2))):
+            if(len(line1) == max_length):
                 string_format = '"' + str(format_json_item(line1[i])) + '": null'
             else:
                string_format = '"null":"' + str(format_json_item(line2[i])) + '"' 
         lines.append(string_format)
-    return ','.join(lines)
+    result = ','.join(lines)
+    if(result != None and result != '' and result != '\n'):
+        result = '{' + str(result) + '}'
+    return result
 
 def remove_first_cover_quote(item):
     if(item != None and len(item) > 2):
@@ -139,10 +186,10 @@ def format_json_item(item):
 
 def run_filename_tests():
     outputs = []
-    outputs.append(test_case21())
-    outputs.append(test_case22())
-    outputs.append(test_case23())
-    outputs.append(test_case24())
+    outputs.append(test_case49())
+    outputs.append(test_case50())
+    outputs.append(test_case51())
+    outputs.append(test_case52())
     write_filename_test_output(outputs)
 
 def write_filename_test_output(outputs):
@@ -197,92 +244,176 @@ def run_filename_test_command(input_name, output_name):
 
 ##Test Cases
 def test_case1():
-    create_test_files(line_combo1(), None, 1)
+    create_test_files(1, line_combo1(), None)
 
 def test_case2():
-    create_test_files(line_combo2(), None, 2)
+    create_test_files(2, line_combo2(), None)
 
 def test_case3():
-    create_test_files(line_combo3(), None, 3)
+    create_test_files(3, line_combo3(), None)
 
 def test_case4():
-    create_test_files(line_combo4(), None, 4)
+    create_test_files(4, line_combo4(), None)
     
 def test_case5():
-    create_test_files(line_combo5(), None, 5)
+    create_test_files(5, line_combo5(), None)
 
 def test_case6():
-    create_test_files(line_combo6(), None, 6)
+    create_test_files(6, line_combo6(), None)
 
 def test_case7():
-    create_test_files(line_combo7(), None, 7)
+    create_test_files(7, line_combo7(), None)
 
 def test_case8():
-    create_test_files(line_combo8(), None, 8)
-    
+    create_test_files(8, line_combo8(), None)
+
 def test_case9():
-    create_test_files(line_combo2(), line_combo3(), 9)
+    create_test_files(9, line_combo1(), line_combo1())
 
 def test_case10():
-    create_test_files(line_combo4(), line_combo5(), 10)
+    create_test_files(10, line_combo2(), line_combo2(), line_combo4())
 
 def test_case11():
-    create_test_files(line_combo6(), line_combo7(), 11)
+    create_test_files(11, line_combo2(), line_combo3(), line_combo5())
 
 def test_case12():
-    create_test_files(line_combo7(), line_combo8(), 12)
+    create_test_files(12, line_combo3(), line_combo2(), line_combo4())
 
 def test_case13():
-    create_test_files(line_combo6(), line_combo2(), 13)
+    create_test_files(13, line_combo3(), line_combo3(), line_combo5())
 
 def test_case14():
-    create_test_files(line_combo7(), line_combo3(), 14)
+    create_test_files(14, line_combo4(), line_combo2(), line_combo4())
 
 def test_case15():
-    create_test_files(line_combo8(), line_combo4(), 15)
+    create_test_files(15, line_combo4(), line_combo3(), line_combo5())
 
 def test_case16():
-    create_test_files(line_combo7(), line_combo5(), 16)
+    create_test_files(16, line_combo5(), line_combo2(), line_combo4())
 
 def test_case17():
-    create_test_files(line_combo2(), line_combo6(), 17)
+    create_test_files(17, line_combo5(), line_combo3(), line_combo5())
 
 def test_case18():
-    create_test_files(line_combo3(), line_combo7(), 18)
+    create_test_files(18, line_combo6(), line_combo6(), line_combo7())
 
 def test_case19():
-    create_test_files(line_combo4(), line_combo8(), 19)
+    create_test_files(19, line_combo6(), line_combo7(), line_combo8())
 
 def test_case20():
-    create_test_files(line_combo5(), line_combo7(), 20)
+    create_test_files(20, line_combo7(), line_combo6(), line_combo7())
+
+def test_case21():
+    create_test_files(21, line_combo7(), line_combo7(), line_combo8())
+
+def test_case22():
+    create_test_files(22, line_combo8(), line_combo6(), line_combo7())
+
+def test_case23():
+    create_test_files(23, line_combo8(), line_combo7(), line_combo8())
+
+def test_case24():
+    create_test_files(24, line_combo1(), line_combo2(), line_combo4())
+
+def test_case25():
+    create_test_files(25, line_combo1(), line_combo3(), line_combo5())
+
+def test_case26():
+    create_test_files(26, line_combo1(), line_combo6(), line_combo7())
+
+def test_case27():
+    create_test_files(27, line_combo1(), line_combo7(), line_combo8())
+
+def test_case28():
+    create_test_files(28, line_combo2(), line_combo6(), line_combo7())
+
+def test_case29():
+    create_test_files(29, line_combo2(), line_combo7(), line_combo8())
+
+def test_case30():
+    create_test_files(30, line_combo3(), line_combo6(), line_combo7())
+
+def test_case31():
+    create_test_files(31, line_combo3(), line_combo7(), line_combo8())
+
+def test_case32():
+    create_test_files(32, line_combo4(), line_combo6(), line_combo7())
+
+def test_case33():
+    create_test_files(33, line_combo4(), line_combo7(), line_combo8())
+
+def test_case34():
+    create_test_files(34, line_combo5(), line_combo6(), line_combo7())
+
+def test_case35():
+    create_test_files(35, line_combo5(), line_combo7(), line_combo8())
+
+def test_case36():
+    create_test_files(36, line_combo2(), line_combo1())
+
+def test_case37():
+    create_test_files(37, line_combo3(), line_combo1())
+
+def test_case38():
+    create_test_files(38, line_combo4(), line_combo1())
+
+def test_case39():
+    create_test_files(39, line_combo5(), line_combo1())
+
+def test_case40():
+    create_test_files(40, line_combo6(), line_combo1(), line_combo2())
+
+def test_case41():
+    create_test_files(41, line_combo6(), line_combo3(), line_combo4())
+
+def test_case42():
+    create_test_files(42, line_combo6(), line_combo5(), line_combo1())
+
+def test_case43():
+    create_test_files(43, line_combo7(), line_combo1(), line_combo2())
+
+def test_case44():
+    create_test_files(44, line_combo7(), line_combo3(), line_combo4())
+
+def test_case45():
+    create_test_files(45, line_combo7(), line_combo5(), line_combo1())
+
+def test_case46():
+    create_test_files(46, line_combo8(), line_combo1(), line_combo2())
+
+def test_case47():
+    create_test_files(47, line_combo8(), line_combo3(), line_combo4())
+
+def test_case48():
+    create_test_files(48, line_combo8(), line_combo5(), line_combo1())
+
+def create_test_files(case_number, line1, line2, line3=None):
+    lines = insert_csv_lines(line1, line2, line3)
+    write_input(lines, case_number)
+    json_lines = insert_json_lines(line1, line2, line3)
+    write_output(json_lines, case_number)
 
 
 ## Filename Test Cases
-def test_case21():
+def test_case49():
     status = run_filename_test_command("NotExist", "NotExist")
-    return filename_error_compare(21, 1, status)
+    return filename_error_compare(49, 1, status)
 
-def test_case22():
+def test_case50():
     status = run_filename_test_command(None, "NotExist")
-    return filename_error_compare(22, 1, status)
+    return filename_error_compare(50, 1, status)
 
-def test_case23():
+def test_case51():
     create_csv_for_filename_test()
     create_json_for_filename_test()
     status = run_filename_test_command("Exist", "Exist")    
-    filename_override_output_compare(23)
-    return filename_error_compare(23, 0, status)
+    filename_override_output_compare(51)
+    return filename_error_compare(51, 0, status)
 
-def test_case24():
+def test_case52():
     create_csv_for_filename_test()
     status = run_filename_test_command("Exist", None)
-    return filename_error_compare(24, 1, status)
-
-def create_test_files(line1, line2, case_number):
-    lines = insert_csv_lines(line1, line2)
-    write_input(lines, case_number)
-    json_lines = insert_json_lines(line1, line2)
-    write_output(json_lines, case_number)
+    return filename_error_compare(52, 1, status)
 
     
 ##Line combination
@@ -310,12 +441,14 @@ def line_combo7():
 def line_combo8():
     return generate_line(2,4)
 
-def generate_line(item1, item2):
+def generate_line(item1, item2, item3=None):
     line = []
     if(item1 != None):
         line.append(itemlist[item1])
     if(item2 != None):
         line.append(itemlist[item2])
+    if(item3 != None):
+        line.append(itemlist[item3])
     return line
 
 if __name__ == '__main__':
