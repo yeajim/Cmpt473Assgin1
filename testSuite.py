@@ -3,7 +3,7 @@
 
 ## Cmpt 473 Assignment 1 Test Suite
 ## Yeaji Moon - 301097918
-## Rei Li
+## Lijun Li   - 301138319
 
 import json
 import csv
